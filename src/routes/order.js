@@ -13,6 +13,7 @@ router.get('/', async (req,res)=> {
                 customerId: item.customerId,
                 products: item.products,
                 response_midtrans: JSON.parse(item.response_midtrans),
+                status: item.status,
                 createdAt: item.createdAt,
                 updatedAt: item.updatedAt,
             }
@@ -89,17 +90,20 @@ router.get('/:customerId', (req, res, next) => {
         query.exec(function(err, data) {
             if(err) return next(err);
             
-            // SET FORMAT
-            data.map(item=>{
-                res.status(200).json({
+
+            // SET FORMAT STRING TO JSON RESPONSE MIDTRANS
+                const newOrders = data.map(item => {
+                    return {
                     _id: item._id,
                     customerId: item.customerId,
                     products: item.products,
                     response_midtrans: JSON.parse(item.response_midtrans),
+                    status : item.status,
                     createdAt: item.createdAt,
                     updatedAt: item.updatedAt,
-                })
-            })
+                }});
+
+            res.status(200).json(newOrders);
         })
     } catch (error) {
         res.status(404).json({message: "order not found!"})
@@ -117,7 +121,16 @@ router.get('/status/:order_id', (req, res) => {
                 if(err){
                     res.status(400).json({error: "update failed"+ err.message})
                 }else{
-                    res.status(200).json(data)
+                    let setData = {
+                        _id : data._id,
+                        customerId : data.customerId,
+                        products : data.products,
+                        response_midtrans : JSON.parse(data.response_midtrans),
+                        status: data.status,
+                        createdAt : data.createdAt,
+                        updatedAt : data.updatedAt
+                    }
+                    res.status(200).json(setData);
                 }
             })
 
@@ -128,6 +141,37 @@ router.get('/status/:order_id', (req, res) => {
                 data: []
             })
         })
+})
+
+// update status order by order id 
+router.get('/acceptOrder/:order_id', async (req, res) => {
+    Order.findByIdAndUpdate(req.params.order_id, {status : "accepted"}, function(err, data){
+                if(err){
+                    res.status(404).json(err)
+                }else{
+                    let setData = {
+                        _id : data._id,
+                        customerId : data.customerId,
+                        products : data.products,
+                        response_midtrans : JSON.parse(data.response_midtrans),
+                        status: data.status,
+                        createdAt : data.createdAt,
+                        updatedAt : data.updatedAt
+                    }
+                    res.status(200).json(setData);
+                }
+            })
+})
+
+router.delete('/delete/:order_id', async (req, res) => {
+    const id = req.params.order_id;
+
+    try {
+        const response = await Order.findByIdAndDelete(id);
+        res.status(200).json(response);
+    } catch (error) {
+        res.status(500).json(error);
+    }
 })
 
 module.exports = router;

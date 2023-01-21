@@ -1,5 +1,5 @@
 const express = require("express");
-const mongoose = require("mongoose")
+const mongoose = require("mongoose");
 const dotenv = require("dotenv");
 const cors = require("cors");
 
@@ -33,6 +33,10 @@ app.use(express.urlencoded({limit: '50mb', extended: false}));
 app.listen(PORT, () => {
   console.log(`backend is running on port ${PORT}`);
 });
+
+app.get('/', (req, res) => {
+  res.send("server is running!")
+})
 
 app.use("/api/order", orderRoute);
 app.use("/api/admin", adminRoute);

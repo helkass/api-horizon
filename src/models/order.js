@@ -20,11 +20,18 @@ const OrderSchema = new mongoose.Schema(
           type: Number,
           default: 1,
         },
+        product_name : {
+          type: String
+        }
       },
     ],
     response_midtrans: {
       type: String,
     },
+    status : {
+      type : String,
+      default : "non-processed"
+    }
   },
   { timestamps: true },
 );
